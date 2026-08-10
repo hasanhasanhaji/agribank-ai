@@ -5,7 +5,7 @@ from app.core.exceptions import (
     AppException,
     app_exception_handler,
 )
-from app.core.logging import configure_logging
+from app.core.loging import configure_logging
 
 
 settings = get_settings()
