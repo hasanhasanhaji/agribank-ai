@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from app.api.health import router as health_router
 from app.core.config import get_settings
 from app.core.exceptions import (
     AppException,
