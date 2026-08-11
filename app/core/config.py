@@ -30,7 +30,7 @@ class Settings(BaseSettings):
         description="Base API prefix",)
 
     database_url: str = Field( 
-        default=( "postgresql+asyncpg://" "posgres:0173276" "@localhost:5432/"
+        default=( "postgresql+asyncpg://" "postgres:0173276" "@localhost:5432/"
                   "agribank" ), description="PostgreSQL database URL", )
 
     model_config = SettingsConfigDict(
