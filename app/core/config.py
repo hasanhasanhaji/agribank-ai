@@ -29,6 +29,10 @@ class Settings(BaseSettings):
         default="/api/v1",
         description="Base API prefix",)
 
+    database_url: str = Field( 
+        default=( "postgresql+asyncpg://" "posgres:0173276" "@localhost:5432/"
+                  "agribank" ), description="PostgreSQL database URL", )
+
     model_config = SettingsConfigDict(
         env_file= ".env",
         env_file_encoding="utf-8",
