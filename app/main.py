@@ -4,7 +4,7 @@ from app.api.health import router as health_router
 from app.core.config import get_settings
 from app.core.exceptions import (
     AppException,
-    app_exception_handler,
+    
 )
 from app.core.loging import configure_logging
 from app.modules.customers.router import (
@@ -29,7 +29,7 @@ app = FastAPI(
 
 app.add_exception_handler(
     AppException,
-    app_exception_handler,
+    AppException.app_exception_handler,
 )
 
 
