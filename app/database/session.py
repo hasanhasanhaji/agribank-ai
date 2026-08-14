@@ -14,7 +14,7 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession
 ) # create async session maker for database session management
 
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Provide a database session for a single request.
     """

@@ -29,6 +29,30 @@ class CustomerCreate(BaseModel):
     )
 
 
+class CustomerUpdate(BaseModel):
+    """
+    Request schema for partially updating a customer.
+    """
+
+    first_name: str | None = Field(
+        default=None,
+        min_length=2,
+        max_length=100,
+    )
+
+    last_name: str | None = Field(
+        default=None,
+        min_length=2,
+        max_length=100,
+    )
+
+    phone_number: str | None = Field(
+        default=None,
+        min_length=10,
+        max_length=20,
+    )
+
+
 class CustomerResponse(BaseModel):
     """
     Response schema for customer data.
@@ -45,3 +69,17 @@ class CustomerResponse(BaseModel):
     phone_number: str
     created_at: datetime
 
+
+class CustomerListResponse(BaseModel):
+    """
+    Paginated customer response.
+    """
+
+    items: list[CustomerResponse]
+
+    page: int
+    page_size: int
+
+    total: int
+
+    total_pages: int

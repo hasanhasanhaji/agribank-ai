@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from app.api.health import router as health_router
 from app.core.config import get_settings
 from app.core.exceptions import (
-    AppException,
+    AppException,app_exception_handler
     
 )
 from app.core.loging import configure_logging
@@ -29,7 +29,7 @@ app = FastAPI(
 
 app.add_exception_handler(
     AppException,
-    AppException.app_exception_handler,
+    app_exception_handler,
 )
 
 

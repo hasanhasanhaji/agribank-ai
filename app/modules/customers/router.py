@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.session import get_session as get_db
+from app.database.session import get_db
 from app.modules.customers.schemas import (
     CustomerCreate,
+    CustomerListResponse,
     CustomerResponse,
+    CustomerUpdate,
 )
 from app.modules.customers.service import CustomerService
 
@@ -30,16 +32,7 @@ async def create_customer(
 
     service = CustomerService(session)
 
-    try:
-        customer = await service.create_customer(data)
-
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(exc),
-        ) from exc
-
-    return customer
+    return await service.create_customer(data)
 
 
 @router.get(
@@ -56,14 +49,82 @@ async def get_customer(
 
     service = CustomerService(session)
 
-    customer = await service.get_customer(
-        customer_id
+    return await service.get_customer(customer_id)
+
+
+@router.get(
+    "",
+    response_model=CustomerListResponse,
+)
+async def list_customers(
+    page: int = Query(
+        default=1,
+        ge=1,
+        description="Page number",
+    ),
+    page_size: int = Query(
+        default=20,
+        ge=1,
+        le=100,
+        description="Number of items per page",
+    ),
+    session: AsyncSession = Depends(get_db),
+) -> CustomerListResponse:
+    """
+    Retrieve a paginated list of customers.
+    """
+
+    service = CustomerService(session)
+
+    customers, total, total_pages = (
+        await service.list_customers(
+            page=page,
+            page_size=page_size,
+        )
     )
 
-    if customer is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Customer not found.",
-        )
+    return CustomerListResponse(
+        items=customers,
+        page=page,
+        page_size=page_size,
+        total=total,
+        total_pages=total_pages,
+    )
 
-    return customer
+
+@router.patch(
+    "/{customer_id}",
+    response_model=CustomerResponse,
+)
+async def update_customer(
+    customer_id: int,
+    data: CustomerUpdate,
+    session: AsyncSession = Depends(get_db),
+) -> CustomerResponse:
+    """
+    Partially update a customer.
+    """
+
+    service = CustomerService(session)
+
+    return await service.update_customer(
+        customer_id=customer_id,
+        data=data,
+    )
+
+
+@router.delete(
+    "/{customer_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_customer(
+    customer_id: int,
+    session: AsyncSession = Depends(get_db),
+) -> None:
+    """
+    Delete a customer.
+    """
+
+    service = CustomerService(session)
+
+    await service.delete_customer(customer_id)

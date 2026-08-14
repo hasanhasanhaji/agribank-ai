@@ -1,6 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.modules.customers.models import Customer
+
 
 class CustomerRepository:
     """
@@ -26,6 +28,7 @@ class CustomerRepository:
                 Customer.id == customer_id
             )
         )
+
         return result.scalar_one_or_none()
 
     async def get_by_national_id(
@@ -44,6 +47,51 @@ class CustomerRepository:
 
         return result.scalar_one_or_none()
 
+    async def get_by_phone_number(
+        self,
+        phone_number: str,
+    ) -> Customer | None:
+        """
+        Retrieve a customer by phone number.
+        """
+
+        result = await self.session.execute(
+            select(Customer).where(
+                Customer.phone_number == phone_number
+            )
+        )
+
+        return result.scalar_one_or_none()
+
+    async def get_all(
+        self,
+        offset: int,
+        limit: int,
+    ) -> list[Customer]:
+        """
+        Retrieve a paginated list of customers.
+        """
+
+        result = await self.session.execute(
+            select(Customer)
+            .order_by(Customer.id)
+            .offset(offset)
+            .limit(limit)
+        )
+
+        return list(result.scalars().all())
+
+    async def count(self) -> int:
+        """
+        Return the total number of customers.
+        """
+
+        result = await self.session.execute(
+            select(func.count()).select_from(Customer)
+        )
+
+        return result.scalar_one()
+
     async def create(
         self,
         customer: Customer,
@@ -59,3 +107,13 @@ class CustomerRepository:
         await self.session.refresh(customer)
 
         return customer
+
+    async def delete(
+        self,
+        customer: Customer,
+    ) -> None:
+        """
+        Delete a customer from the database.
+        """
+
+        await self.session.delete(customer)
